@@ -27,7 +27,7 @@ async def get_one_message(id: int):
         return Message(**message_doc)
     return None
 
-async def get_all_messages():
+async def get_all_messages(current_user: str):
     cursor = collection.find({"chatRoom": "pnh0002"}, 
                              {"messages":1, "_id": 0})
     documents = await cursor.to_list(length=None)
@@ -35,7 +35,13 @@ async def get_all_messages():
     all_messages = []
     for doc in documents: 
         if "messages" in doc: 
-            all_messages.extend(doc["messages"])
+            for msg in doc["messages"]:
+                # Determine who sent the message based on the current user
+                if "sender" in msg and msg["sender"] == current_user:
+                    msg["who"] = WhoIs.USER.value
+                else:
+                    msg["who"] = WhoIs.OTHER.value
+                all_messages.append(msg)
 
     return all_messages
 
@@ -52,13 +58,14 @@ async def send_message(message: dict):
 
 
 # Function to add a object into the chatRoom array 
-async def add_message(who: WhoIs, message: Message): 
+async def add_message(who: str, message: str, sender: str): 
     await collection.update_one(
         {'_id': 1},
         { '$push': {
             'messages': {
                 'message': message,
-                'who': who
+                'who': who,
+                'sender': sender
             }
         }}
     ); 

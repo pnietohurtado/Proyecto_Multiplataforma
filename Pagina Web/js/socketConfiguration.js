@@ -74,7 +74,7 @@ class WebSocketChat {
                 // createConversation(this.currentRoom, chatMessage);
 
                 // Enviar a la API
-                await fetch(`http://localhost:8000/api/sendmessage/${this.currentRoom}/${encodeURIComponent(chatMessage.message)}`, {
+                await fetch(`http://localhost:8000/api/sendmessage/${this.currentRoom}/${this.currentUser}/${encodeURIComponent(chatMessage.message)}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ class WebSocketChat {
 
     async loadHistory() {
         try {
-            const response = await fetch('http://localhost:8000/api/getmessages');
+            const response = await fetch(`http://localhost:8000/api/getmessages/${this.currentUser}`);
             if (!response.ok) {
                 console.error('Failed to fetch history');
                 return;
@@ -181,7 +181,7 @@ class WebSocketChat {
                 const isOwn = msg.who === 'user';
                 const chatMessage = {
                     message: msg.message,
-                    user: isOwn ? this.currentUser : 'Contact',
+                    user: msg.sender || (isOwn ? this.currentUser : 'Contact'),
                     timestamp: msg.date
                 };
                 this.displayMessage(chatMessage, isOwn);

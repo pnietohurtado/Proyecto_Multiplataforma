@@ -10,7 +10,8 @@ class WhoIs(Enum):
 class Data(BaseModel): 
     message: str 
     date:  Optional[datetime] = Field(default_factory=datetime.now)
-    who: WhoIs
+    who: str # Changed from WhoIs to str to avoid validation errors if we want to be flexible, but WhoIs is fine if we map it. Let's keep WhoIs for now but we might need to change it on retrieval. Actually, the goal is to return "user" or "other".
+    sender: str
 
 class Message(BaseModel): 
     _id: Optional[int] = None

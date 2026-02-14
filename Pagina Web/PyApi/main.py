@@ -21,13 +21,13 @@ async def welcome():
     return {'message': 'Hello!'}
 
 
-@app.post('/api/sendmessage/{chatRoom}/{message}')
-async def sendMessage(chatRoom: str, message:str): 
-    await add_message(WhoIs.USER.value, message); 
+@app.post('/api/sendmessage/{chatRoom}/{sender}/{message}')
+async def sendMessage(chatRoom: str, sender:str, message:str): 
+    await add_message(WhoIs.USER.value, message, sender); 
     return {'message': 'Everything send correctly'}
 
 
-@app.get('/api/getmessages')
-async def getAllMessages(): 
-    messages = await get_all_messages() 
+@app.get('/api/getmessages/{username}')
+async def getAllMessages(username: str): 
+    messages = await get_all_messages(username) 
     return messages
